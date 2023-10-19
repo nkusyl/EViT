@@ -7,10 +7,10 @@ This repository will contain the PyTorch training and evaluation code for [EViT]
 If you use this code for a paper please cite:
 
 ```
-@article{li2021localvit,
-  title={LocalViT: Bringing Locality to Vision Transformers},
-  author={Li, Yawei and Zhang, Kai and Cao, Jiezhang and Timofte, Radu and Van Gool, Luc},
-  journal={arXiv preprint arXiv:2104.05707},
-  year={2021}
+@article{shi2023evit,
+  title={EViT: An Eagle Vision Transformer with Bi-Fovea Self-Attention},
+  author={Shi, Yulong and Sun, Mingwei and Wang, Yongshuai and Wang, Rui and Sun, Hui and Chen, Zengqiang},
+  journal={arXiv preprint arXiv:2310.06629},
+  year={2023}
 }
 ```
