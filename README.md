@@ -4,6 +4,8 @@ The code will be released at this repository after the paper [EViT](https://arxi
 
 This repository will contain the PyTorch training and evaluation code for [EViT](https://arxiv.org/abs/2310.06629).
 
+The overall pipeline of EViT is illustrated in this figure.
+
 ![EViT](./figs/EViT.png)
 
 If you use this code for a paper please cite:
