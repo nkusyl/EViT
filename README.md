@@ -1,10 +1,10 @@
 # EViT: An Eagle Vision Transformer with Bi-Fovea Self-Attention
 
-The code will be released at this repository after the paper [EViT](https://arxiv.org/abs/2310.06629) is accepted by journals.
+The code will be released at this repository after the paper [EViTs](https://arxiv.org/abs/2310.06629) is accepted by journals.
 
-This repository will contain the PyTorch training and evaluation code for [EViT](https://arxiv.org/abs/2310.06629).
+This repository will contain the PyTorch training and evaluation code for [EViTs](https://arxiv.org/abs/2310.06629).
 
-The overall pipeline of EViT is illustrated in this figure.
+The overall pipeline of EViTs is illustrated in this figure.
 
 ![EViT](./figs/EViT.png)
 
