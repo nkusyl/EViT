@@ -58,7 +58,7 @@ pip install opencv-python==4.4.0.46 termcolor==1.1.0 yacs==0.1.8
 | EViT_Large |  224 | 84.4  |    61.9     | 237M [[Google]](https://drive.google.com/file/d/183JMYDLCe9YNNEpOUnjGhjMzz4R90bT-/view?usp=sharing) [[BaiduNetdisk]](https://pan.baidu.com/s/1lNJAGeAxqOhVueVR71cv4Q?pwd=dth2)  |
 
 ## Evaluation
-To evaluate a pre-trained PVT-Small on ImageNet val with a single GPU run:
+To evaluate a pre-trained EViT-Tiny on ImageNet val with a single GPU run:
 ```
 python -m torch.distributed.run --nproc_per_node=8 --master_port 18875 train.py --eval True --model EViT_Tiny --datasets_path /home/ubuntu/Datasets/ImageNet --resume /home/ubuntu/Datasets/EViT-main/save_path/EViT_Tiny.pth
 ```
