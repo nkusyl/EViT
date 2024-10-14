@@ -99,38 +99,38 @@ class Attention(nn.Module):
 
     def forward(self, x, H, W):
 
-        B, N, C = x.shape  # [1, 3136, 64]
+        B, N, C = x.shape
 
         if self.sr_ratio > 1:
             q_1 = self.q_1(x).reshape(B, N, self.num_heads, (C) // self.num_heads).permute(0, 2, 1,
-                                                                                           3)  # [1, 2, 3136, 32]
-            x_1 = x.permute(0, 2, 1).reshape(B, C, H, W)  # [1, 64, 56, 56]
-            x_1 = self.act(self.norm_1(self.sr_1(x_1).reshape(B, C, -1).permute(0, 2, 1)))  # [1, 49, 64]
+                                                                                           3)
+            x_1 = x.permute(0, 2, 1).reshape(B, C, H, W)
+            x_1 = self.act(self.norm_1(self.sr_1(x_1).reshape(B, C, -1).permute(0, 2, 1)))
             k_1 = self.k_1(x_1).reshape(B, -1, self.num_heads, (C) // self.num_heads).permute(0, 2, 1,
-                                                                                              3)  # [1, 2, 49, 32]
+                                                                                              3)
             v_1 = self.v_1(x_1).reshape(B, -1, self.num_heads, (C) // self.num_heads).permute(0, 2, 1, 3)
 
-            attn_1 = (q_1 @ k_1.transpose(-2, -1)) * self.scale  # [1, 2, 3136, 49]
+            attn_1 = (q_1 @ k_1.transpose(-2, -1)) * self.scale
             attn_1 = attn_1.softmax(dim=-1)
             attn_1 = self.attn_drop(attn_1)
-            x_1 = (attn_1 @ v_1).transpose(1, 2).reshape(B, N, (C))  # [1, 3136, 64]
-            x_1 = self.proj_1(x_1)  # # [1, 3136, 64]
+            x_1 = (attn_1 @ v_1).transpose(1, 2).reshape(B, N, (C))
+            x_1 = self.proj_1(x_1)
             x_1 = self.proj_drop(x_1)
 
             q_2 = self.q_2(x_1).reshape(B, N, self.num_heads, (C) // self.num_heads).permute(0, 2, 1,
-                                                                                             3)  # [1, 2, 3136, 32]
-            x_2 = x_1.permute(0, 2, 1).reshape(B, (C), H, W)  # [1, 64, 56, 56]
-            x_2 = self.act(self.norm_2(self.sr_2(x_2).reshape(B, (C), -1).permute(0, 2, 1)))  # [1, 49, 64]
+                                                                                             3)
+            x_2 = x_1.permute(0, 2, 1).reshape(B, (C), H, W)
+            x_2 = self.act(self.norm_2(self.sr_2(x_2).reshape(B, (C), -1).permute(0, 2, 1)))
             k_2 = self.k_2(x_2).reshape(B, -1, self.num_heads, (C) // self.num_heads).permute(0, 2, 1,
-                                                                                              3)  # [1, 2, 49, 32]
+                                                                                              3)
             v_2 = self.v_2(x_2).reshape(B, -1, self.num_heads, (C) // self.num_heads).permute(0, 2, 1,
-                                                                                              3)  # [1, 2, 49, 32
+                                                                                              3)
 
-            attn_2 = (q_2 @ k_2.transpose(-2, -1)) * self.scale  # [1, 2, 3136, 49]
+            attn_2 = (q_2 @ k_2.transpose(-2, -1)) * self.scale
             attn_2 = attn_2.softmax(dim=-1)
             attn_2 = self.attn_drop(attn_2)
-            x_2 = (attn_2 @ v_2).transpose(1, 2).reshape(B, N, (C))  # [1, 3136, 64]
-            x_2 = x_1 + x_2  # [1, 3136, 64]
+            x_2 = (attn_2 @ v_2).transpose(1, 2).reshape(B, N, (C))
+            x_2 = x_1 + x_2
 
             x = self.proj_2(x_2)
             x = self.proj_drop(x)
@@ -156,7 +156,6 @@ class Block(nn.Module):
         self.attn = Attention(
             dim, num_heads=num_heads, qkv_bias=qkv_bias, qk_scale=qk_scale,
             attn_drop=attn_drop, proj_drop=drop, sr_ratio=sr_ratio)
-        # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
@@ -236,7 +235,7 @@ class EViT(nn.Module):
         self.patch_embed_d = PatchEmbed(
             img_size=img_size // 16, patch_size=2, in_chans=embed_dims[2], embed_dim=embed_dims[3])
 
-        dpr = [x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))]  # stochastic depth decay rule
+        dpr = [x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))]
         cur = 0
         self.blocks_a = nn.ModuleList([
             Block(
@@ -266,24 +265,9 @@ class EViT(nn.Module):
                 norm_layer=norm_layer, qk_ratio=qk_ratio, sr_ratio=sr_ratios[3])
             for i in range(depths[3])])
 
-        # self.pre_logits = nn.Identity()
-
-        # Classifier head
-        # self.stage_norm_1 = norm_layer(embed_dims[0])
-        # self.stage_norm_2 = norm_layer(embed_dims[1])
-        # self.stage_norm_3 = norm_layer(embed_dims[2])
-        # self.stage_norm_4 = norm_layer(embed_dims[3])
-
-        # self.head_fc = nn.Linear(embed_dims[3], fc_dim)
-        # self.head_act_layer = nn.GELU()
         self.head_norm = norm_layer(embed_dims[3])
         self.head_avgpool = nn.AdaptiveAvgPool1d(1)
 
-        # self._fc = nn.Conv2d(embed_dims[-1], fc_dim, kernel_size=1)
-        # self._bn = nn.BatchNorm2d(fc_dim, eps=1e-5)
-        # self._swish = MemoryEfficientSwish()
-        # self._avg_pooling = nn.AdaptiveAvgPool2d(1)
-        # self._drop = nn.Dropout(dp)
         self.head = nn.Linear(embed_dims[3], num_classes) if num_classes > 0 else nn.Identity()
         self.apply(self._init_weights)
 
@@ -325,39 +309,26 @@ class EViT(nn.Module):
         x, (H, W) = self.patch_embed_a(x)
         for i, blk in enumerate(self.blocks_a):
             x = blk(x, H, W)
-            # x = self.stage_norm_1(x)
 
         x = x.reshape(B, H, W, -1).permute(0, 3, 1, 2).contiguous()
         x, (H, W) = self.patch_embed_b(x)
         for i, blk in enumerate(self.blocks_b):
             x = blk(x, H, W)
-            # x = self.stage_norm_2(x)
 
         x = x.reshape(B, H, W, -1).permute(0, 3, 1, 2).contiguous()
         x, (H, W) = self.patch_embed_c(x)
         for i, blk in enumerate(self.blocks_c):
             x = blk(x, H, W)
-            # x = self.stage_norm_3(x)
 
         x = x.reshape(B, H, W, -1).permute(0, 3, 1, 2).contiguous()
         x, (H, W) = self.patch_embed_d(x)
         for i, blk in enumerate(self.blocks_d):
             x = blk(x, H, W)
-            # x = self.stage_norm_4(x)
 
-        # x = self.head_fc(x)
-        # x = self.head_act_layer(x)
         x = self.head_norm(x)
-        x = self.head_avgpool(x.transpose(1, 2))  # B C 1
+        x = self.head_avgpool(x.transpose(1, 2))
         x = torch.flatten(x, 1)
 
-        # B, N, C = x.shape
-        # x = self._fc(x.permute(0, 2, 1).reshape(B, C, H, W))
-        # x = self._bn(x)
-        # x = self._swish(x)
-        # x = self._avg_pooling(x).flatten(start_dim=1)
-        # x = self._drop(x)
-        # x = self.pre_logits(x)
         return x
 
     def forward(self, x):
@@ -390,23 +361,4 @@ def build_backbone(backbone_name, num_classes):
     else:
         raise NotImplementedError
     return backbone
-
-
-if __name__ == '__main__':
-    _backbone_name = 'EViT_Large'
-    num_classes = 1000
-
-    model = build_backbone(_backbone_name, num_classes)
-
-    model.eval()
-    inputs = torch.randn(1, 3, 256, 256)
-    model(inputs)
-
-    flops = FlopCountAnalysis(model, inputs)
-    param = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    acts = ActivationCountAnalysis(model, inputs)
-
-    print(f"total flops : {flops.total()/1024/1024/1024}")
-    print(f"total activations: {acts.total()}")
-    print(f"number of parameter: {param/1000/1000}")
 
