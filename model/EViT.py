@@ -24,7 +24,7 @@ class MemoryEfficientSwish(nn.Module):
         return SwishImplementation.apply(x)
 
 
-class BFFFN(nn.Module):
+class BFFN(nn.Module):
     def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.):
         super().__init__()
         out_features = out_features or in_features
@@ -159,7 +159,7 @@ class Block(nn.Module):
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
-        self.mlp = BFFFN(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
+        self.mlp = BFFN(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
         self.proj = nn.Conv2d(dim, dim, 3, 1, 1, groups=dim)
 
     def forward(self, x, H, W):
@@ -361,4 +361,5 @@ def build_backbone(backbone_name, num_classes):
     else:
         raise NotImplementedError
     return backbone
+
 
