@@ -44,17 +44,8 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             logging.error("Loss is {}, stopping training".format(loss_value))
             sys.exit(1)
 
-        # # 如果 loss 是 NaN 或 Inf，跳过该 batch 并继续训练
-        # if not math.isfinite(loss_value):
-        #     logging.warning(f"Loss is {loss_value}, skipping this batch.")
-        #     optimizer.zero_grad(set_to_none=True)
-        #     del loss, loss_value, outputs
-        #     torch.cuda.empty_cache()
-        #     continue
-
         optimizer.zero_grad()
 
-        # this attribute is added by timm on one optimizer (adahessian)
         is_second_order = hasattr(optimizer, 'is_second_order') and optimizer.is_second_order
         loss_scaler(loss, optimizer, clip_grad=max_norm,
                     parameters=model.parameters(), create_graph=is_second_order)
@@ -65,7 +56,6 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
         metric_logger.update(loss=loss_value)
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
-        # gather the stats from all processes
     metric_logger.synchronize_between_processes()
     print("Averaged stats:", metric_logger)
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
@@ -77,14 +67,12 @@ def evaluate(data_loader, model, device, header = 'Test:'):
 
     metric_logger = utils.MetricLogger(delimiter="  ")
 
-    # switch to evaluation mode
     model.eval()
 
     for images, target in metric_logger.log_every(data_loader, 200, header):
         images = images.to(device, non_blocking=True)
         target = target.to(device, non_blocking=True)
 
-        # compute output
         with torch.cuda.amp.autocast():
             output = model(images)
             loss = criterion(output, target)
