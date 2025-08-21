@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
 
-This is the official PyTorch implementation of [EViTs](https://arxiv.org/abs/2310.06629). It is worth noting that the latest manuscript is still under review.
+This is the official PyTorch implementation of [EViTs](https://ieeexplore.ieee.org/abstract/document/10876565).
 
 We draw inspiration from eagle vision and summarize a Bi-Fovea Visual Interaction (BFVI) structure based on the unique physiological and visual characteristics of eagle eyes. Based on this structural design approach, a novel Bi-Fovea Self-Attention (BFSA) and Bi-Fovea Feedforward Network (BFFN) are proposed. They are used to mimic how the biological visual cortex processes information hierarchically and in parallel, facilitating networks to learn feature representations of targets from coarse to fine. Furthermore, a Bionic Eagle Vision (BEV) block is designed as the basic building unit based on BFSA and BFFN. By stacking BEV blocks, a unified and efficient pyramid backbone network family called Eagle Vision Transformers (EViTs) are developed.
 
@@ -66,10 +66,14 @@ python -m torch.distributed.run --nproc_per_node=8 --master_port 18875 train.py 
 If you use this code for a paper please cite:
 
 ```
-@article{shi2023evit,
-  title={EViT: An Eagle Vision Transformer with Bi-Fovea Self-Attention},
-  author={Shi, Yulong and Sun, Mingwei and Wang, Yongshuai and Wang, Rui and Sun, Hui and Chen, Zengqiang},
-  journal={arXiv preprint arXiv:2310.06629},
-  year={2023}
+@article{shi2025evit,
+  title={Evit: An eagle vision transformer with bi-fovea self-attention},
+  author={Shi, Yulong and Sun, Mingwei and Wang, Yongshuai and Ma, Jiahao and Chen, Zengqiang},
+  journal={IEEE Transactions on Cybernetics},
+  year={2025},
+  volume={55},
+  number={3},
+  pages={1288-1300},
+  publisher={IEEE}
 }
 ```
